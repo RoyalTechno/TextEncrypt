@@ -1,0 +1,46 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+	echo "Missing argument: $0 <shift_value>"
+	exit 1
+fi
+
+SHIFT=$1
+ENCRYPT=true
+
+#Check for sudo for decryption
+if [ "$EUID" -eq 0 ]; then
+	echo "Decrypting..."
+	ENCRYPT=false
+else
+	echo "Encrypting..."
+fi
+
+#Encrypt text files based on caesar cipher
+caesar_cipher(){
+	local encrypt=$1
+	local shift=$2
+	local file=$3
+	
+	local upper="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    	local lower="abcdefghijklmnopqrstuvwxyz"
+    	# Shift the upper and lower alphabet by shift value
+    	local shifted_upper="${upper:$shift}${upper:0:$shift}"
+    	local shifted_lower="${lower:$shift}${lower:0:$shift}"
+	
+	if $encrypt; then
+		cat $file | tr "$upper$lower" "$shifted_upper$shifted_lower" >> "$file.temp"
+	else
+		 cat $file | tr "$shifted_upper$shifted_lower" "$upper$lower" >> "$file.temp"
+	fi
+}
+
+for file in *.txt; do
+	#check file is regular text file
+	if [ -f "$file" ]; then
+		caesar_cipher $ENCRYPT $SHIFT $file
+		mv "$file.temp" "$file"
+		echo "$file processed"
+	fi
+done
+	

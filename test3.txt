@@ -1,0 +1,7 @@
+test file 3 with new lines and spaces
+
+Hi I 	have no			Idea
+     Why there 	so many    spaces
+
+ice cream
+
